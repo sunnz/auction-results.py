@@ -48,11 +48,9 @@ def main():
             print('read sample.html into auction_data_raw.')
             print('test mode on')
     except IOError as e:
-        """
-        url = baseurl + '/auction-results/vic'
+        url = baseurl + path
         response = urllib.request.urlopen(url)
         auction_data_raw = response.read().decode()
-        """
         print('download data into auction_data_raw.')
         test = False
         print('test mode off')
