@@ -165,7 +165,7 @@ def auction_result(auction_data_raw, baseurl, suburb, test, emails, from_addr):
     msg.attach(email.mime.text.MIMEText(results, 'html'))
 
     for name, image in images:
-        img = email.mime.image.MIMEImage(base64.standard_b64decode(image))
+        img = email.mime.image.MIMEImage(base64.standard_b64decode(image), _subtype='png')
         img.add_header('Content-ID', '<{name}>'.format(name=name))
         msg.attach(img)
 
