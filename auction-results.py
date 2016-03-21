@@ -9,6 +9,7 @@ import email.mime.multipart
 import email.mime.text
 import email.mime.image
 import base64
+import re
 import datetime
 import yaml
 
@@ -22,6 +23,7 @@ def main():
         sys.exit(1)
 
     baseurl = config['baseurl']
+    textimageurl = config['textimageurl']
     from_addr = config['from']
     for config_path, suburbs in config['paths'].items():
         for name, suburb_config in suburbs.items():
@@ -61,12 +63,13 @@ def main():
             print('backed up auction_data_raw to data.html')
 
         auction_result(auction_data_raw, baseurl,
-                       suburb, test, emails, from_addr)
+                       textimageurl, suburb, test, emails, from_addr)
     else:
         print('no auction data wo!')
 
 
-def auction_result(auction_data_raw, baseurl, suburb, test, emails, from_addr):
+def auction_result(auction_data_raw, baseurl, textimageurl,
+                   suburb, test, emails, from_addr):
     parserlib = 'lxml'
     # parserlib = 'html5lib'
 
@@ -118,15 +121,11 @@ def auction_result(auction_data_raw, baseurl, suburb, test, emails, from_addr):
         image = img_src.replace('data:image/png;base64,', '')
         images.append(('{0:d}_price'.format(n), image))
 
-        img_fmt = (
-            '<img src="cid:{0:d}_bed" '
-            'style="max-height:17px;height:17px;width:auto">'
-        )
-        img = img_fmt.format(n)
-        results += row_template.format(header=headers[2], data=img)
         img_src = row_soup.select('.col-num-beds img').pop()['src']
-        image = img_src.replace('data:image/png;base64,', '')
-        images.append(('{0:d}_bed'.format(n), image))
+        encoded = img_src.replace(textimageurl, '')
+        encoded = re.sub(r'\?.*', '', encoded)
+        beds = base64.b64decode(encoded).decode()
+        results += row_template.format(header=headers[2], data=beds)
 
         results += row_template.format(
             header=headers[3],
@@ -136,15 +135,11 @@ def auction_result(auction_data_raw, baseurl, suburb, test, emails, from_addr):
             header=headers[4],
             data=row_soup.select('.col-auction-result').pop().string)
 
-        img_fmt = (
-            '<img src="cid:{0:d}_date" '
-            'style="max-height:17px;height:17px;width:auto">'
-        )
-        img = img_fmt.format(n)
-        results += row_template.format(header=headers[5], data=img)
         img_src = row_soup.select('.col-auction-date img').pop()['src']
-        image = img_src.replace('data:image/png;base64,', '')
-        images.append(('{0:d}_date'.format(n), image))
+        encoded = img_src.replace(textimageurl, '')
+        encoded = re.sub(r'\?.*', '', encoded)
+        date = base64.b64decode(encoded).decode()
+        results += row_template.format(header=headers[5], data=date)
 
         agency_list = row_soup.select('.col-agent a.agency-profile-url')
         if len(agency_list):
@@ -165,7 +160,8 @@ def auction_result(auction_data_raw, baseurl, suburb, test, emails, from_addr):
     msg.attach(email.mime.text.MIMEText(results, 'html'))
 
     for name, image in images:
-        img = email.mime.image.MIMEImage(base64.standard_b64decode(image), _subtype='png')
+        img = email.mime.image.MIMEImage(
+            base64.standard_b64decode(image), _subtype='png')
         img.add_header('Content-ID', '<{name}>'.format(name=name))
         msg.attach(img)
 
