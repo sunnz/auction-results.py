@@ -18,54 +18,51 @@ def main():
     try:
         with open('config.yaml', 'r') as config_file:
             config = yaml.load(config_file)
-    except (OSError, IOError) as e:
+    except (OSError, IOError):
         print('cannot openfile config.yaml. :-(')
         sys.exit(1)
 
     baseurl = config['baseurl']
     textimageurl = config['textimageurl']
     from_addr = config['from']
-    for config_path, suburbs in config['paths'].items():
-        for name, suburb_config in suburbs.items():
-            suburb = name
-            path = config_path
-            emails = suburb_config['emails']
 
     print('baseurl: ' + baseurl)
+    print('textimageurl: ' + textimageurl)
     print('from_addr: ' + from_addr)
-    print('suburb: ' + suburb)
-    print('path: ' + path)
-    print('emails: ' + repr(emails))
 
-    """
-    suburb = 'carnegie'
-    baseurl = base64.standard_b64decode().decode()
-    """
+    for config_path, suburbs in config['paths'].items():
+        path = config_path
+        print('path: ' + path)
 
-    auction_data_raw = None
-    test = True
-    try:
-        with open('sample.html', 'r') as sample_file:
-            auction_data_raw = sample_file.read()
-            print('read sample.html into auction_data_raw.')
-            print('test mode on')
-    except IOError as e:
-        url = baseurl + path
-        response = urllib.request.urlopen(url)
-        auction_data_raw = response.read().decode()
-        print('download data into auction_data_raw.')
-        test = False
-        print('test mode off')
+        auction_data_raw = None
+        test = True
+        try:
+            with open('sample.html', 'r') as sample_file:
+                auction_data_raw = sample_file.read()
+                print('read sample.html into auction_data_raw.')
+                print('test mode on')
+        except IOError:
+            url = baseurl + path
+            response = urllib.request.urlopen(url)
+            auction_data_raw = response.read().decode()
+            print('download data into auction_data_raw.')
+            test = False
+            print('test mode off')
 
-    if auction_data_raw:
-        with open('data.html', 'w') as f:
-            f.write(auction_data_raw)
-            print('backed up auction_data_raw to data.html')
+        if auction_data_raw:
+            with open('data.html', 'w') as f:
+                f.write(auction_data_raw)
+                print('backed up auction_data_raw to data.html')
 
-        auction_result(auction_data_raw, baseurl,
-                       textimageurl, suburb, test, emails, from_addr)
-    else:
-        print('no auction data wo!')
+            for name, suburb_config in suburbs.items():
+                suburb = name
+                emails = suburb_config['emails']
+                print('suburb: ' + suburb)
+                print('emails: ' + repr(emails))
+                auction_result(auction_data_raw, baseurl,
+                               textimageurl, suburb, test, emails, from_addr)
+        else:
+            print('no auction data for {path} wo!'.format(path=path))
 
 
 def auction_result(auction_data_raw, baseurl, textimageurl,
