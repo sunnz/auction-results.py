@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import yaml
+import smtplib
+import requests
+import urllib.error
 import auction.suburb
 
 
@@ -25,8 +28,17 @@ def main():
                 auction_data_raw = sample_file.read()
                 print('loaded sample.html into auction_data_raw.')
         except (OSError, IOError):
-            print('failed reading sample.html data file. :(')
-            exit(2)
+            url = '{base}/{path}'.format(base=config['baseurl'], path=config_path)
+            headers = {}
+            headers['User-Agent'] = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11;'
+                ' rv:47.0) Gecko/20100101 Firefox/47.0')
+            headers['DNT'] = '1'
+            headers['Accept'] = ('text/html,application/xhtml+xml,application/xml;'
+                'q=0.9,*/*;q=0.8')
+            headers['Accept-Language'] = 'en-GB,en;q=0.5'
+            headers['Accept-Encoding'] = 'gzip, deflate, br'
+            req = requests.get(url)
+            auction_data_raw = req.text
 
         # load each suburb.
         for name, suburb_config in suburbs.items():
