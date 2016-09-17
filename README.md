@@ -1,7 +1,7 @@
 ## requirements
 
 - python 3.x.
-    - tested and developed on 3.3 and 3.5.
+    - tested and developed on 3.3, 3.4, and 3.5.
 - install dependencies in requirements.txt:
     - `pip install -r requirements.txt`.
     - you may need `sudo` if you are not using virtualenv.
