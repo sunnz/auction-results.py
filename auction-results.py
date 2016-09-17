@@ -46,16 +46,22 @@ def main():
             print('suburb: ' + name)
             print('emails: ' + repr(sub_emails))
             mySuburb = auction.suburb.Suburb(name, config['from'], sub_emails, auction_data_raw)
-            #mySuburb._pprint()
-            #mySuburb._print_class()
-            #print(mySuburb.get_rendered_body('\n'))
             msg = mySuburb.render_msg('\n')
+
+            # send out results.
+            s = smtplib.SMTP('localhost')
+            results = []
             for email in sub_emails:
                 if 'To' in msg:
                     del msg['To']
                 msg['To'] = email
-                print()
-                print(msg.as_string())
+
+                if True == config['live']:
+                    s.send_message(msg)
+
+                results.append(msg.as_string())
+            s.quit()
+            print('\n'.join(results))
 
 if __name__ == '__main__':
     main()
