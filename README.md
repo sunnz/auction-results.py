@@ -16,3 +16,7 @@
                 - http://louistiao.me/posts/installing-lxml-on-mac-osx-1011-inside-a-virtualenv-with-pip/
                 - https://bugs.launchpad.net/lxml/+bug/1503807
                 - http://lxml.de/installation.html#source-builds-on-macos-x
+
+## license
+
+auction-results.py is available under the mit license. also see ``LICENSE.md``.
