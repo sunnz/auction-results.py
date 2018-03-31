@@ -37,7 +37,7 @@ def main():
                 'q=0.9,*/*;q=0.8')
             headers['Accept-Language'] = 'en-GB,en;q=0.5'
             headers['Accept-Encoding'] = 'gzip, deflate, br'
-            req = requests.get(url)
+            req = requests.get(url, headers=headers)
             auction_data_raw = req.text
 
         # load each suburb.
