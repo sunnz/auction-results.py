@@ -25,14 +25,16 @@ def test_auctionresults():
         # load html for this (geographical) state.
         with open('sample.html', 'r') as sample_file:
             auction_data_raw = sample_file.read()
-        assert auction_data_raw != None
+        assert auction_data_raw is not None
 
         # load each suburb.
         for name, suburb_config in suburbs.items():
             sub_emails = suburb_config['emails']
             print('suburb: ' + name)
             print('emails: ' + repr(sub_emails))
-            mySuburb = auction.suburb.Suburb(name, config['from'], sub_emails, auction_data_raw)
+            mySuburb = auction.suburb.Suburb(
+                name, config['from'], sub_emails, auction_data_raw
+            )
             msg = mySuburb.render_msg('\n')
 
             # send out results.
@@ -46,6 +48,7 @@ def test_auctionresults():
                 results.append(msg.as_string())
             s.quit()
             print('\n'.join(results))
+
 
 if __name__ == '__main__':
     test_auctionresults()
